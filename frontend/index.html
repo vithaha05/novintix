@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EduAgent Chat</title>
+    <style>
+      :root {
+        --bg: #0f0f0f;
+        --panel: #171717;
+        --panel-2: #202020;
+        --text: #ffffff;
+        --muted: #a3a3a3;
+        --line: #2b2b2b;
+        --accent: #6366f1;
+        --danger: #dc2626;
+        --blue: #2563eb;
+        --orange: #ea580c;
+        --green: #16a34a;
+        --grey: #6b7280;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+
+      .app {
+        height: 100vh;
+        max-width: 980px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: 18px;
+        gap: 14px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      button {
+        border: 1px solid var(--line);
+        background: var(--panel-2);
+        color: var(--text);
+        font: inherit;
+        min-height: 40px;
+        padding: 0 14px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: var(--accent);
+      }
+
+      button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .messages {
+        min-height: 0;
+        overflow-y: auto;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 16px;
+      }
+
+      .empty {
+        height: 100%;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      .message {
+        display: grid;
+        gap: 8px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        background: #121212;
+      }
+
+      .message + .message {
+        margin-top: 12px;
+      }
+
+      .message-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .role {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .badge {
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 11px;
+        color: #fff;
+        white-space: nowrap;
+      }
+
+      .badge.ACADEMIC {
+        background: var(--blue);
+      }
+
+      .badge.TECH {
+        background: var(--orange);
+      }
+
+      .badge.ADMIN {
+        background: var(--green);
+      }
+
+      .badge.ESCALATION {
+        background: var(--danger);
+      }
+
+      .badge.UNKNOWN {
+        background: var(--grey);
+      }
+
+      .text {
+        white-space: pre-wrap;
+        line-height: 1.5;
+        font-size: 14px;
+      }
+
+      .composer {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 14px;
+      }
+
+      .banner {
+        display: none;
+        margin-bottom: 12px;
+        padding: 11px 12px;
+        background: #3f1111;
+        border: 1px solid var(--danger);
+        color: #fecaca;
+        font-size: 13px;
+      }
+
+      .input-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+      }
+
+      input {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid var(--line);
+        background: #0b0b0b;
+        color: var(--text);
+        font: inherit;
+        padding: 0 12px;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+      }
+
+      .loading {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 10px;
+        min-height: 18px;
+      }
+
+      @media (max-width: 640px) {
+        .app {
+          padding: 10px;
+        }
+
+        header {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .input-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header>
+        <div>
+          <h1>EduAgent</h1>
+          <div class="subtitle">CS101 support chat</div>
+        </div>
+        <button id="newConversationButton" type="button">New Conversation</button>
+      </header>
+
+      <section id="messages" class="messages" aria-live="polite">
+        <div id="emptyState" class="empty">Ask a CS101 question to begin.</div>
+      </section>
+
+      <section class="composer">
+        <div id="escalationBanner" class="banner">This query has been escalated to a human agent</div>
+        <div class="input-row">
+          <input id="messageInput" type="text" autocomplete="off" placeholder="Type your message..." />
+          <button id="sendButton" class="primary" type="button">Send</button>
+        </div>
+        <div id="loading" class="loading"></div>
+      </section>
+    </main>
+
+    <script>
+      const API_URL = "http://127.0.0.1:8000/chat";
+      const messagesEl = document.getElementById("messages");
+      const emptyStateEl = document.getElementById("emptyState");
+      const inputEl = document.getElementById("messageInput");
+      const sendButtonEl = document.getElementById("sendButton");
+      const newConversationButtonEl = document.getElementById("newConversationButton");
+      const loadingEl = document.getElementById("loading");
+      const escalationBannerEl = document.getElementById("escalationBanner");
+
+      let sessionId = null;
+      let isSending = false;
+
+      function normalizeAgent(agent) {
+        const value = String(agent || "UNKNOWN").toUpperCase();
+        return ["ACADEMIC", "TECH", "ADMIN", "ESCALATION", "UNKNOWN"].includes(value) ? value : "UNKNOWN";
+      }
+
+      function appendMessage(roleLabel, text, agentUsed) {
+        emptyStateEl.style.display = "none";
+
+        const agent = normalizeAgent(agentUsed);
+        const messageEl = document.createElement("article");
+        messageEl.className = "message";
+
+        const headEl = document.createElement("div");
+        headEl.className = "message-head";
+
+        const roleEl = document.createElement("div");
+        roleEl.className = "role";
+        roleEl.textContent = roleLabel;
+
+        const badgeEl = document.createElement("div");
+        badgeEl.className = `badge ${agent}`;
+        badgeEl.textContent = agent;
+
+        const textEl = document.createElement("div");
+        textEl.className = "text";
+        textEl.textContent = text;
+
+        headEl.appendChild(roleEl);
+        headEl.appendChild(badgeEl);
+        messageEl.appendChild(headEl);
+        messageEl.appendChild(textEl);
+        messagesEl.appendChild(messageEl);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      function setSending(sending) {
+        isSending = sending;
+        sendButtonEl.disabled = sending;
+        inputEl.disabled = sending;
+        loadingEl.textContent = sending ? "EduAgent is thinking..." : "";
+      }
+
+      async function sendMessage() {
+        const query = inputEl.value.trim();
+        if (!query || isSending) {
+          return;
+        }
+
+        appendMessage("You", query, "UNKNOWN");
+        inputEl.value = "";
+        setSending(true);
+
+        const payload = {
+          student_id: "S001",
+          query,
+          course_id: "CS101"
+        };
+        if (sessionId) {
+          payload.session_id = sessionId;
+        }
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          sessionId = data.session_id || sessionId;
+          appendMessage("EduAgent", data.response || "", data.agent_used || "UNKNOWN");
+          escalationBannerEl.style.display = data.escalated ? "block" : "none";
+        } catch (error) {
+          appendMessage("EduAgent", `Request failed: ${error.message}`, "ESCALATION");
+        } finally {
+          setSending(false);
+          inputEl.focus();
+          messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+      }
+
+      function newConversation() {
+        sessionId = null;
+        messagesEl.innerHTML = "";
+        messagesEl.appendChild(emptyStateEl);
+        emptyStateEl.style.display = "grid";
+        escalationBannerEl.style.display = "none";
+        loadingEl.textContent = "";
+        inputEl.value = "";
+        inputEl.focus();
+      }
+
+      sendButtonEl.addEventListener("click", sendMessage);
+      newConversationButtonEl.addEventListener("click", newConversation);
+      inputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+
+      inputEl.focus();
+    </script>
+  </body>
+</html>

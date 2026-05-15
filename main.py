@@ -10,6 +10,8 @@ from uuid import uuid4
 import chromadb
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from langchain_groq import ChatGroq
 from pydantic import BaseModel, Field
 
@@ -26,6 +28,7 @@ session_store: dict[str, list] = {}
 load_dotenv()
 
 app = FastAPI(title="EduAgent", version="0.1.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(PIIMiddleware)
 
 
@@ -227,6 +230,8 @@ def chat(request: ChatRequest) -> QueryResponse:
         escalated=bool(result.get("escalated", False)),
         session_id=session_id,
     )
+
+
 
 
 @app.get("/chat/{session_id}/history")
