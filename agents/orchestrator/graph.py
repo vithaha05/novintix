@@ -34,7 +34,7 @@ llm = _build_llm()
 
 
 def classify_node(state: EduAgentState) -> EduAgentState:
-    route = classify_intent(state["masked_query"], llm)
+    route = classify_intent(state["masked_query"], llm, history=state.get("conversation_history", []))
     frustration = detect_frustration(state["masked_query"])
     return {
         **state,

@@ -60,13 +60,18 @@ def _clamp_confidence(value: str) -> float:
     return max(0.0, min(1.0, confidence))
 
 
-def classify_intent(query: str, llm: ChatGroq) -> RouteDecision:
-    response = llm.invoke(
-        [
-            SystemMessage(content=CLASSIFIER_SYSTEM_PROMPT),
-            HumanMessage(content=query),
-        ]
-    )
+def classify_intent(query: str, llm: ChatGroq, history: list | None = None) -> RouteDecision:
+    messages = [SystemMessage(content=CLASSIFIER_SYSTEM_PROMPT)]
+    if history:
+        context = "\n".join(f"{m['role'].upper()}: {m['content']}" for m in history[-4:])
+        messages.append(SystemMessage(content=f"Recent conversation:\n{context}"))
+    messages.append(HumanMessage(content=query))
+    messages = [SystemMessage(content=CLASSIFIER_SYSTEM_PROMPT)]
+    if history:
+        context = "\n".join(f"{m['role'].upper()}: {m['content']}" for m in history[-4:])
+        messages.append(SystemMessage(content=f"Recent conversation:\n{context}"))
+    messages.append(HumanMessage(content=query))
+    response = llm.invoke(messages)
     content = str(response.content)
     parsed: dict[str, str] = {}
 
