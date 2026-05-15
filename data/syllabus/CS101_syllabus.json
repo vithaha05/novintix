@@ -1,0 +1,84 @@
+{
+  "course_id": "CS101",
+  "course_name": "Introduction to Computer Science",
+  "modules": [
+    {
+      "module_id": "M1",
+      "title": "Computational Thinking and Python Basics",
+      "topics": [
+        "problem decomposition",
+        "variables and data types",
+        "input and output",
+        "conditional logic"
+      ],
+      "assignments": [
+        {
+          "assignment_id": "A1",
+          "title": "Campus Calculator",
+          "question_text": "Build a Python program that calculates weekly study hours from user input and prints a short recommendation.",
+          "graded": true,
+          "due_date": "2026-02-06"
+        },
+        {
+          "assignment_id": "A2",
+          "title": "Conditionals Practice",
+          "question_text": "Write pseudocode and Python snippets for three everyday decisions using if, elif, and else.",
+          "graded": false,
+          "due_date": "2026-02-10"
+        }
+      ]
+    },
+    {
+      "module_id": "M2",
+      "title": "Loops, Functions, and Testing",
+      "topics": [
+        "for loops",
+        "while loops",
+        "function design",
+        "unit testing basics"
+      ],
+      "assignments": [
+        {
+          "assignment_id": "A3",
+          "title": "Gradebook Functions",
+          "question_text": "Implement reusable functions to calculate average, minimum, and maximum scores from a list of grades.",
+          "graded": true,
+          "due_date": "2026-02-24"
+        },
+        {
+          "assignment_id": "A4",
+          "title": "Loop Trace Reflection",
+          "question_text": "Trace two loop examples by hand and explain how the loop variable changes after each iteration.",
+          "graded": false,
+          "due_date": "2026-02-28"
+        }
+      ]
+    },
+    {
+      "module_id": "M3",
+      "title": "Data Structures and Algorithms",
+      "topics": [
+        "lists and dictionaries",
+        "searching",
+        "sorting",
+        "algorithmic complexity"
+      ],
+      "assignments": [
+        {
+          "assignment_id": "A5",
+          "title": "Contact Book",
+          "question_text": "Create a command-line contact book using dictionaries, including add, search, update, and delete operations.",
+          "graded": true,
+          "due_date": "2026-03-14"
+        },
+        {
+          "assignment_id": "A6",
+          "title": "Search Comparison",
+          "question_text": "Compare linear search and binary search using a small dataset and explain when each approach is appropriate.",
+          "graded": true,
+          "due_date": "2026-03-20"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+1. How do I submit an assignment?
+Answer: Submit assignments through the learning portal under the course Assignments tab. Upload the requested file type and confirm that the submission receipt appears.
+
+2. What happens if I miss a deadline?
+Answer: Late work may receive a penalty unless an approved extension is recorded before the due date. Check the course syllabus for the exact late policy.
+
+3. Can I request an extension?
+Answer: Yes. Contact the course staff before the deadline with the assignment name, reason, and proposed new date. Extensions are not guaranteed.
+
+4. I cannot log in to the student portal. What should I do?
+Answer: Reset your password, clear browser cookies, and try a current version of Chrome, Firefox, Safari, or Edge. If login still fails, contact technical support with the error message.
+
+5. My assignment upload failed. How can I fix it?
+Answer: Check your connection, file size, and file format. Rename the file without special characters and try again before the deadline.
+
+6. Where can I see my grades?
+Answer: Grades are posted in the learning portal under Grades. Some grades may remain hidden until manual review is complete.
+
+7. How are programming assignments graded?
+Answer: Programming work is usually graded using correctness, code clarity, tests, documentation, and adherence to instructions.
+
+8. Can I resubmit an assignment?
+Answer: Resubmission depends on the assignment settings. If resubmission is enabled, upload the revised file before the deadline.
+
+9. What should I do if I think my grade is incorrect?
+Answer: Review the rubric and feedback first. If you still see an issue, submit a polite regrade request with specific evidence.
+
+10. Who do I contact for account or access problems?
+Answer: Contact technical support for password, portal, browser, and access issues. Include your course ID and a screenshot of the error if possible.
