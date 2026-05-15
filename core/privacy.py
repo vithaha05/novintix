@@ -23,10 +23,41 @@ PII_PATTERNS: dict[str, tuple[str, str]] = {
     "AADHAAR": (r"\b\d{4}\s\d{4}\s\d{4}\b", "[AADHAAR]"),
 }
 
+NAME_CONTEXT_PATTERNS: tuple[re.Pattern[str], ...] = (
+    re.compile(
+        r"(?i)\b(?P<prefix>my name is|i am|i'm|this is|student name is|name\s*[:=]\s*)"
+        r"\s*(?P<name>[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\b"
+    ),
+    re.compile(
+        r"(?i)\b(?P<prefix>student|learner|user)\s+"
+        r"(?P<name>[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\b"
+    ),
+)
+
+
+def _mask_names(text: str, pii_map: dict[str, str]) -> str:
+    masked_text = text
+    counter = 0
+
+    for pattern in NAME_CONTEXT_PATTERNS:
+
+        def replace_match(match: re.Match[str]) -> str:
+            nonlocal counter
+            counter += 1
+            token = f"[NAME_{counter}]"
+            pii_map[token] = match.group("name")
+            prefix = match.group("prefix")
+            separator = "" if prefix.endswith((" ", "=", ":")) else " "
+            return f"{prefix}{separator}{token}"
+
+        masked_text = pattern.sub(replace_match, masked_text)
+
+    return masked_text
+
 
 def mask_pii(text: str) -> tuple[str, dict[str, str]]:
-    masked_text = text
     pii_map: dict[str, str] = {}
+    masked_text = _mask_names(text, pii_map)
     counters = {pii_type: 0 for pii_type in PII_PATTERNS}
 
     for pii_type, (pattern, _) in PII_PATTERNS.items():
@@ -78,7 +109,7 @@ def _write_pii_audit(session_id: str, pii_map: dict[str, str]) -> None:
 
 class PIIMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable[[Request], Any]) -> Response:
-        if request.method != "POST" or request.url.path != "/query":
+        if request.method != "POST" or request.url.path not in {"/query", "/chat"}:
             return await call_next(request)
 
         body = await request.body()

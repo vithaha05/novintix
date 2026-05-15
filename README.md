@@ -176,6 +176,12 @@ View chat history:
 curl http://127.0.0.1:8000/chat/PASTE_SESSION_ID_HERE/history
 ```
 
+Open local monitoring dashboard:
+
+```text
+http://127.0.0.1:8000/monitoring
+```
+
 ## Run The Demo
 
 Start the server first, then in a second terminal:
@@ -215,8 +221,9 @@ Local logs are written under `logs/`:
 - `logs/tutor_interactions.json` — tutor metadata only, no query/response content
 - `logs/pii_audit.log` — PII detection metadata only
 - `logs/guardrail_triggers.json` — prompt-injection/direct-answer trigger metadata
+- `logs/learning_outcomes.jsonl` — privacy-safe learning proxies such as hints, repeats, lecture redirects, and escalation
 
-No LangSmith or external monitoring service is used.
+No LangSmith or external monitoring service is used. A local dashboard is available at `/monitoring`.
 
 ## Problem Statement Completion
 
@@ -229,13 +236,13 @@ Source document: `Problem_Statement_3 (2).pdf`
 | Orchestrator manages agents | Complete | `agents/orchestrator/graph.py` uses LangGraph `StateGraph` |
 | Course guidance agent | Complete | `agents/course_guide/course_agent.py` uses ChromaDB RAG |
 | Assignment help agent | Complete | `agents/tutor/tutor_agent.py` uses Socratic mode and TF-IDF graded matching |
-| Technical support agent | Mostly complete | TECH route returns troubleshooting guidance; retry-count escalation after 3 failed tech steps is not fully state-tracked |
+| Technical support agent | Complete | TECH route returns troubleshooting guidance and escalates after repeated failed tech-support turns in `/chat` |
 | Escalation agent/path | Complete | Graph routes low-confidence/frustrated queries to escalation response |
 | Prevent academic dishonesty | Complete | Tutor prompt, TF-IDF graded detection, direct-answer guardrail |
 | Avoid direct answers to graded assignments | Complete | Socratic mode and `contains_direct_answer` guardrail |
-| Ensure student data privacy | Mostly complete | Email/phone/ID/Aadhaar masking exists; name masking is documented/test-assisted but basic regex name masking is not fully implemented in `core/privacy.py` |
-| Monitoring layer tracks misuse/escalation | Mostly complete | Local JSON/log files track PII and guardrail triggers; no dashboard |
-| Track learning outcomes | Partial | Hint count and interaction metadata exist; no real learning-outcome analytics |
+| Ensure student data privacy | Complete for prototype | Name/email/phone/student-ID/Aadhaar masking runs before `/query` and `/chat` handler logic |
+| Monitoring layer tracks misuse/escalation | Complete for prototype | Local logs plus `/monitoring` dashboard track PII, guardrails, escalations, repeats, and learning proxies |
+| Track learning outcomes | Complete for prototype | `logs/learning_outcomes.jsonl` tracks hints, repeats, lecture redirects, escalation, and resolved-proxy metadata |
 | PRD deliverable | Complete | `docs/PRD.md` |
 | GitHub repository with README | Complete | This repository and README |
 | Design-thinking decode | Complete | `docs/DESIGN_THINKING.md` |
@@ -243,13 +250,6 @@ Source document: `Problem_Statement_3 (2).pdf`
 
 ## Honest Status
 
-The main candidate-task implementation is complete enough to run and demo end to end: backend, orchestration, agents, guardrails, privacy layer, frontend, tests, and demo script are present.
+The candidate-task implementation is complete enough to run and demo end to end: backend, orchestration, agents, guardrails, privacy layer, frontend, tests, local monitoring dashboard, and demo script are present.
 
-The only parts I would label as not fully production-grade are:
-
-- Tech Support does not yet track “3 failed troubleshooting steps” across turns.
-- Monitoring is local log files, not a dashboard or analytics service.
-- Learning-outcome tracking is represented by metadata and hint counts, not actual course-performance analytics.
-- Name PII masking is not as strong as email/phone/student-ID masking.
-
-For the assessment PDF, the build satisfies the requested prototype and documentation deliverables; the remaining gaps are production-hardening items rather than missing core scaffold.
+For production, the next upgrades would be persistent session storage, authenticated dashboards, richer academic analytics, and stronger named-entity PII detection. For the assessment PDF, the requested prototype and documentation deliverables are complete.

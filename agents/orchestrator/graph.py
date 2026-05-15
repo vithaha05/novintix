@@ -79,6 +79,22 @@ def course_node(state: EduAgentState) -> EduAgentState:
 
 
 def tech_node(state: EduAgentState) -> EduAgentState:
+    prior_tech_turns = sum(
+        1
+        for message in state.get("conversation_history", [])
+        if message.get("role") == "assistant" and message.get("agent_used") == "TECH"
+    )
+    if prior_tech_turns >= 2:
+        return {
+            **state,
+            "intent": "ESCALATION",
+            "agent_response": (
+                "You've already tried multiple troubleshooting steps. "
+                "Your technical issue has been escalated to a human support agent."
+            ),
+            "escalated": True,
+        }
+
     return {
         **state,
         "agent_response": "Tech support: please try clearing your browser cache. If issue persists, ticket raised.",
