@@ -152,14 +152,7 @@ def startup_event() -> None:
 
     client = chromadb.PersistentClient(path=chroma_dir)
     collection = client.get_or_create_collection(COLLECTION_NAME)
-    if collection.count() == 0:
-        documents = _syllabus_documents()
-        collection.add(
-            ids=[item[0] for item in documents],
-            documents=[item[1] for item in documents],
-            metadatas=[item[2] for item in documents],
-            embeddings=[[0.0] * 16 for _ in documents],
-        )
+    # Seeding skipped — use seed_chroma.py to populate with real embeddings
 
     app.state.chroma_client = client
     app.state.course_collection = collection

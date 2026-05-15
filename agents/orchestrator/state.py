@@ -16,3 +16,5 @@ class EduAgentState(TypedDict):
     hints_given: int
     session_id: str
     conversation_history: list[dict]
+    llm: object
+    chroma_collection: object
