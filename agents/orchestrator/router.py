@@ -31,6 +31,13 @@ FRUSTRATION_KEYWORDS = (
     "not working",
     "failed",
     "hopeless",
+    "frustrated",
+    "cannot",
+    "urgent",
+    "exam",
+    "emergency",
+    "please help",
+    "so angry",
 )
 
 

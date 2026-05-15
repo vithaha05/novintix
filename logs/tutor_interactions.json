@@ -3,3 +3,9 @@
 {"timestamp": "2026-05-15T10:38:09.560250+00:00", "session_id": "6f341dc2-d07a-40c9-b70c-20a52f3684f0", "course_id": "CS101", "response_type": "GENERAL", "hints_given": 0, "graded": false}
 {"timestamp": "2026-05-15T10:42:37.921097+00:00", "session_id": "2f556c71-70db-4f84-aa60-119d065d74be", "course_id": "CS101", "response_type": "GENERAL", "hints_given": 0, "graded": false}
 {"timestamp": "2026-05-15T10:42:39.699915+00:00", "session_id": "2f556c71-70db-4f84-aa60-119d065d74be", "course_id": "CS101", "response_type": "HINT", "hints_given": 0, "graded": false}
+{"timestamp": "2026-05-15T10:52:45.813267+00:00", "session_id": "76c96ee6-ff73-47e3-93a0-834578d0a191", "course_id": "CS101", "response_type": "SOCRATIC", "hints_given": 1, "graded": true}
+{"timestamp": "2026-05-15T10:52:47.135983+00:00", "session_id": "a709dba1-03c9-45eb-9185-e951e0bad18d", "course_id": "CS101", "response_type": "GENERAL", "hints_given": 0, "graded": false}
+{"timestamp": "2026-05-15T10:52:48.047845+00:00", "session_id": "363a0666-19e9-43c7-a0ee-bb81604cd79d", "course_id": "CS101", "response_type": "SOCRATIC", "hints_given": 1, "graded": true}
+{"timestamp": "2026-05-15T10:57:22.553852+00:00", "session_id": "7e125b71-bf06-4cff-954a-987ff5635a48", "course_id": "CS101", "response_type": "SOCRATIC", "hints_given": 1, "graded": true}
+{"timestamp": "2026-05-15T10:57:23.588293+00:00", "session_id": "a7f2195b-2bbe-468f-9d0c-fd29fe575e28", "course_id": "CS101", "response_type": "GENERAL", "hints_given": 0, "graded": false}
+{"timestamp": "2026-05-15T10:57:25.687036+00:00", "session_id": "0fb8ed59-4b39-4139-bb3b-4387289c19c4", "course_id": "CS101", "response_type": "SOCRATIC", "hints_given": 1, "graded": true}
