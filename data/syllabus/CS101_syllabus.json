@@ -35,7 +35,8 @@
         "for loops",
         "while loops",
         "function design",
-        "unit testing basics"
+        "unit testing basics",
+        "recursion"
       ],
       "assignments": [
         {
@@ -51,6 +52,13 @@
           "question_text": "Trace two loop examples by hand and explain how the loop variable changes after each iteration.",
           "graded": false,
           "due_date": "2026-02-28"
+        },
+        {
+          "assignment_id": "A7",
+          "title": "Recursive Factorial",
+          "question_text": "Implement a recursive factorial function in Python. Define the base case and recursive case. Your solution must handle factorial(0) and factorial(1) correctly.",
+          "graded": true,
+          "due_date": "2026-03-01"
         }
       ]
     },

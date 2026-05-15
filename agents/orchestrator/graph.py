@@ -59,12 +59,7 @@ def tutor_node(state: EduAgentState) -> EduAgentState:
     try:
         from agents.tutor.tutor_agent import get_tutor_response
 
-        response = get_tutor_response(
-            query=state["masked_query"],
-            course_id=state["course_id"],
-            conversation_history=state["conversation_history"],
-            hints_given=state["hints_given"],
-        )
+        response = get_tutor_response(state)
     except ImportError:
         from agents.tutor.tutor_agent import run_tutor_agent
 
@@ -74,11 +69,13 @@ def tutor_node(state: EduAgentState) -> EduAgentState:
         }
         response = run_tutor_agent(legacy_state)["response"]
 
-    return {**state, "agent_response": response}
+    return {**state, "agent_response": response.get("agent_response", str(response))}
 
 
 def course_node(state: EduAgentState) -> EduAgentState:
-    return {**state, "agent_response": "Course info: [RAG response placeholder]"}
+    from agents.course_guide.course_agent import get_course_response
+
+    return get_course_response(state)
 
 
 def tech_node(state: EduAgentState) -> EduAgentState:

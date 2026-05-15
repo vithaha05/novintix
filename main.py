@@ -21,6 +21,7 @@ from core.privacy import PIIMiddleware
 MODEL_NAME = "llama-3.3-70b-versatile"
 COLLECTION_NAME = "course_docs"
 BASE_DIR = Path(__file__).resolve().parent
+session_store: dict[str, list] = {}
 
 load_dotenv()
 
@@ -39,6 +40,13 @@ class QueryResponse(BaseModel):
     response: str
     escalated: bool
     session_id: str
+
+
+class ChatRequest(BaseModel):
+    student_id: str = Field(min_length=1)
+    query: str = Field(min_length=1)
+    course_id: str = Field(min_length=1)
+    session_id: str | None = None
 
 
 def _resolve_path(value: str, default: str) -> str:
@@ -107,6 +115,32 @@ def write_json_log(log_dir: str, event_name: str, payload: dict[str, Any]) -> No
         log_file.write(json.dumps(entry, ensure_ascii=True) + "\n")
 
 
+def _build_initial_state(
+    student_id: str,
+    query: str,
+    course_id: str,
+    session_id: str,
+    conversation_history: list,
+) -> dict[str, Any]:
+    return {
+        "student_id": student_id,
+        "query": query,
+        "masked_query": query,
+        "raw_query": query,
+        "intent": "UNKNOWN",
+        "confidence": 0.0,
+        "frustration_score": 0.0,
+        "agent_response": "",
+        "escalated": False,
+        "hints_given": 0,
+        "conversation_history": conversation_history,
+        "course_id": course_id,
+        "session_id": session_id,
+        "chroma_collection": app.state.course_collection,
+        "llm": app.state.llm,
+    }
+
+
 @app.on_event("startup")
 def startup_event() -> None:
     chroma_dir = _resolve_path(os.getenv("CHROMA_PERSIST_DIR", ""), "./chroma_db")
@@ -139,23 +173,13 @@ def health() -> dict[str, str]:
 @app.post("/query", response_model=QueryResponse)
 def query(request: QueryRequest) -> QueryResponse:
     session_id = str(uuid4())
-    initial_state = {
-        "student_id": request.student_id,
-        "query": request.query,
-        "masked_query": request.query,
-        "raw_query": request.query,
-        "intent": "UNKNOWN",
-        "confidence": 0.0,
-        "frustration_score": 0.0,
-        "agent_response": "",
-        "escalated": False,
-        "hints_given": 0,
-        "conversation_history": [],
-        "course_id": request.course_id,
-        "session_id": session_id,
-        "chroma_collection": app.state.course_collection,
-        "llm": app.state.llm,
-    }
+    initial_state = _build_initial_state(
+        student_id=request.student_id,
+        query=request.query,
+        course_id=request.course_id,
+        session_id=session_id,
+        conversation_history=[],
+    )
     result = app.state.graph.invoke(initial_state)
 
     response = QueryResponse(
@@ -174,15 +198,37 @@ def query(request: QueryRequest) -> QueryResponse:
             "agent_used": response.agent_used,
             "escalated": response.escalated,
             "query": request.query,
-        "masked_query": request.query,
-        "raw_query": request.query,
-        "intent": "UNKNOWN",
-        "confidence": 0.0,
-        "frustration_score": 0.0,
-        "agent_response": "",
-        "escalated": False,
-        "hints_given": 0,
-        "conversation_history": [],
         },
     )
     return response
+
+
+@app.post("/chat", response_model=QueryResponse)
+def chat(request: ChatRequest) -> QueryResponse:
+    session_id = request.session_id or str(uuid4())
+    conversation_history = session_store.get(session_id, [])
+    initial_state = _build_initial_state(
+        student_id=request.student_id,
+        query=request.query,
+        course_id=request.course_id,
+        session_id=session_id,
+        conversation_history=conversation_history,
+    )
+    result = app.state.graph.invoke(initial_state)
+    assistant_message = result.get("agent_response", "")
+
+    session_store.setdefault(session_id, conversation_history)
+    session_store[session_id].append({"role": "user", "content": request.query})
+    session_store[session_id].append({"role": "assistant", "content": assistant_message})
+
+    return QueryResponse(
+        agent_used=result.get("intent", "UNKNOWN"),
+        response=assistant_message or "No response generated",
+        escalated=bool(result.get("escalated", False)),
+        session_id=session_id,
+    )
+
+
+@app.get("/chat/{session_id}/history")
+def chat_history(session_id: str) -> list:
+    return session_store.get(session_id, [])
