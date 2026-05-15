@@ -1,71 +1,73 @@
-# EduAgent
+# EduAgent — Multi-Agent EdTech Support System
 
-EduAgent is a local-first educational assistant scaffold built with FastAPI, LangGraph, Groq, ChromaDB, and scikit-learn TF-IDF retrieval. It avoids paid or hosted observability services and writes plain JSON logs to the local `logs/` directory.
+## Overview
+EduAgent is a multi-agent AI orchestration platform for 100,000+ students. Built on FastAPI + LangGraph with Llama 3.3 70B (Groq free tier) and ChromaDB for local RAG. Routes student queries to specialized agents that enforce pedagogical boundaries, resolve technical issues, and escalate distress signals automatically.
 
-## Stack
+## Live Demo
+GitHub: https://github.com/vithaha05/novintix
 
-- Orchestration: LangGraph `StateGraph`
-- LLM: Groq `llama-3.3-70b-versatile` through `langchain-groq`
-- Vector DB: local persistent ChromaDB
-- Backend: FastAPI and Uvicorn
-- Logging: local JSONL files in `logs/`
-- Similarity: scikit-learn TF-IDF
+## Agent Architecture
+- Orchestrator: Zero-shot intent classification (ACADEMIC / TECH / ADMIN / UNKNOWN). Frustration detection via all-caps ratio + exclamation count + keyword scoring. Auto-escalates if frustration > 0.55 or confidence < 85%.
+- Tutor Agent: Socratic mode enforced. TF-IDF cosine similarity detects graded assignments (threshold > 0.35) and activates restricted mode. Hint counter — after 3 hints on same topic, student redirected to lecture video.
+- Course Guide: RAG on CS101_syllabus.json via ChromaDB. Top-3 chunk retrieval as LLM context. Eliminates hallucinations on dates and deadlines.
+- Tech Support: Resolves platform issues. Auto-escalates after 3 failed troubleshooting steps.
+- Escalation Agent: Packages full conversation context for human agent with priority tag.
+
+## Tech Stack
+| Layer | Technology |
+|-------|-----------|
+| Orchestration | LangGraph StateGraph |
+| LLM | Llama 3.3 70B via Groq (free tier) |
+| Vector DB | ChromaDB (fully local) |
+| Assignment Matching | scikit-learn TF-IDF |
+| API | FastAPI + Uvicorn |
+| Session Memory | In-memory session_store (multi-turn /chat) |
+| Testing | pytest + unittest.mock (9/9 passing) |
+
+## Guardrails
+- Academic Integrity: TF-IDF similarity > 0.35 on graded assignments forces Socratic mode
+- Direct Answer Blocking: Regex classifier blocks solutions/code in tutor responses
+- PII Masking: Names, emails, IDs masked before every LLM call (PIIMiddleware)
+- Prompt Injection: Input filtering in core/guardrails.py
+
+## API Endpoints
+- POST /query — stateless single-turn query
+- POST /chat — stateful multi-turn with session memory
+- GET /chat/{session_id}/history — full conversation history
+- GET /health — system health check
 
 ## Setup
+1. Clone: git clone https://github.com/vithaha05/novintix.git && cd novintix/edu-agent
+2. Install: pip install -r requirements.txt
+3. Configure: cp .env.example .env — add GROQ_API_KEY from console.groq.com
+4. Run: uvicorn main:app --reload
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-Add a Groq API key to `.env`:
-
-```bash
-GROQ_API_KEY=your_key_here
-```
-
-The app can still start without a Groq key, but agent responses fall back to deterministic local messages.
-
-## Run
-
-```bash
-uvicorn main:app --reload
-```
-
-## Endpoints
-
-```http
-GET /health
-```
-
-Returns service status, model name, and vector database name.
-
-```http
-POST /query
-Content-Type: application/json
-
-{
-  "student_id": "student-123",
-  "query": "When is the gradebook assignment due?",
-  "course_id": "CS101"
-}
-```
-
-Returns:
-
-```json
-{
-  "agent_used": "course_guide",
-  "response": "Here is the most relevant course information I found: ...",
-  "escalated": false,
-  "session_id": "..."
-}
-```
+## Demo
+python3 demo.py  # runs 4 automated scenarios, prints PASS/FAIL
 
 ## Test
+pytest tests/ -v  # 9/9 tests, no Groq key required
 
-```bash
-pytest
-```
+## Folder Structure
+edu-agent/
+├── agents/
+│   ├── orchestrator/     # StateGraph, intent classifier, frustration detector
+│   ├── tutor/            # Socratic mode, TF-IDF graded detection
+│   ├── course_guide/     # ChromaDB RAG
+│   └── tech_support/     # Troubleshooting + escalation logic
+├── core/
+│   ├── guardrails.py     # Direct-answer classifier, prompt injection filter
+│   ├── privacy.py        # PII masking middleware
+│   └── routing.py        # Thresholds and intent categories
+├── data/
+│   └── syllabus/         # CS101_syllabus.json (RAG source)
+├── tests/                # pytest coverage (guardrails, privacy, routing)
+├── frontend/             # index.html chat UI
+├── demo.py               # Automated 4-scenario demo script
+└── main.py               # FastAPI app, /query, /chat, /health
+
+## Demo Results
+- Scenario 1 (Tutor graded): PASS — Socratic response, no answer leaked
+- Scenario 2 (Course Guide RAG): PASS — Module 2 topics retrieved from syllabus
+- Scenario 3 (Multi-turn): PASS — Session ID preserved across turns
+- Scenario 4 (Escalation): PASS — Frustration detected, human handoff triggered
