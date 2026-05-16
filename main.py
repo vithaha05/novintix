@@ -340,7 +340,7 @@ def chat(request: ChatRequest) -> QueryResponse:
     assistant_message = result.get("agent_response", "")
 
     session_store.setdefault(session_id, conversation_history)
-    session_store[session_id].append({"role": "user", "content": request.query})
+    session_store[session_id].append({"role": "user", "content": result.get("masked_query", request.query)})
     session_store[session_id].append(
         {
             "role": "assistant",

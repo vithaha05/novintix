@@ -14,7 +14,7 @@ ACADEMIC, TECH, ADMIN, UNKNOWN.
 
 Use ACADEMIC for learning help, concepts, tutoring, homework guidance, and course topic questions.
 Use TECH for login, password, upload, browser, access, account, and platform issues.
-Use ADMIN for deadlines, grading, rubrics, syllabus, submissions, schedules, and policy questions.
+Use ADMIN for deadlines, grading, rubrics, syllabus, submissions, schedules, policy questions, module topics, course content, what topics are covered, course structure, and assignment lists.
 Use UNKNOWN when the query does not clearly fit any category.
 
 You must respond in exactly this format:
